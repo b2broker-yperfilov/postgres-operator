@@ -269,7 +269,11 @@ func (r *ReconcilePostgresUser) addFinalizer(reqLogger logr.Logger, m *dbv1alpha
 }
 
 func (r *ReconcilePostgresUser) newSecretForCR(cr *dbv1alpha1.PostgresUser, role, password, login string) *corev1.Secret {
-	pgUserUrl := fmt.Sprintf("postgresql://%s:%s@%s/%s", role, password, r.pgHost, cr.Status.DatabaseName)
+	args := ""
+	if len(r.pg.GetConnectionArgs()) > 0 {
+		args = "?" + r.pg.GetConnectionArgs()
+	}
+	pgUserUrl := fmt.Sprintf("postgresql://%s:%s@%s/%s%s", role, password, r.pgHost, cr.Status.DatabaseName, args)
 	pgJDBCUrl := fmt.Sprintf("jdbc:postgresql://%s/%s", r.pgHost, cr.Status.DatabaseName)
 	pgDotnetUrl := fmt.Sprintf("User ID=%s;Password=%s;Host=%s;Port=5432;Database=%s;", role, password, r.pgHost, cr.Status.DatabaseName)
 	labels := map[string]string{

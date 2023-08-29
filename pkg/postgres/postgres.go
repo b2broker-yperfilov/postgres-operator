@@ -22,6 +22,7 @@ type PG interface {
 	DropDatabase(db string, logger logr.Logger) error
 	DropRole(role, newOwner, database string, logger logr.Logger) error
 	GetUser() string
+	GetConnectionArgs() string
 	GetDefaultDatabase() string
 }
 
@@ -65,6 +66,10 @@ func NewPG(host, user, password, uri_args, default_database, cloud_type string, 
 		logger.Info("Using default postgres implementation")
 		return postgres, nil
 	}
+}
+
+func (c *pg) GetConnectionArgs() string {
+	return c.args
 }
 
 func (c *pg) GetUser() string {
